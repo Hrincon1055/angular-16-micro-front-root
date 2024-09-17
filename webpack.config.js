@@ -4,11 +4,7 @@ const {
 } = require("@angular-architects/module-federation/webpack");
 let modelsAndControls;
 let publicPathUrl;
-let enviroment = process.env.npm_lifecycle_script
-  .split(" ")
-  .pop()
-  .trim()
-  .toLowerCase();
+let enviroment = process.env.NODE_ENVIROMENT;
 console.log("webpack.config LINE 12 =>", process.env.NODE_ENVIROMENT);
 
 switch (enviroment) {
@@ -21,10 +17,12 @@ switch (enviroment) {
     publicPathUrl = "http://localhost:4200/";
     break;
   case "production":
+    console.log("webpack.config LINE 20 => production");
     modelsAndControls = "http://localhost:4201/remoteEntry.js";
-    publicPathUrl = "http://localhost:4200/";
+    publicPathUrl = "https://bucolic-dango-87ca31.netlify.app/";
     break;
   default:
+    console.log("webpack.config LINE 25 => default");
     modelsAndControls = "http://localhost:4201/remoteEntry.js";
     publicPathUrl = "http://localhost:4200/";
     break;
@@ -43,6 +41,5 @@ const moduleFederationConfig = withModuleFederationPlugin({
   },
 });
 
-moduleFederationConfig.output.publicPath =
-  "https://bucolic-dango-87ca31.netlify.app/";
+moduleFederationConfig.output.publicPath = publicPathUrl;
 module.exports = moduleFederationConfig;
