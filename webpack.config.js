@@ -42,5 +42,6 @@ const moduleFederationConfig = withModuleFederationPlugin({
   },
 });
 
-moduleFederationConfig.output.publicPath = "http://localhost:4200/";
+moduleFederationConfig.output.publicPath =
+  "https://bucolic-dango-87ca31.netlify.app/";
 module.exports = moduleFederationConfig;
