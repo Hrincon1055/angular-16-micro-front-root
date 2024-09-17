@@ -9,6 +9,7 @@ let enviroment = process.env.npm_lifecycle_script
   .pop()
   .trim()
   .toLowerCase();
+console.log("webpack.config LINE 12 =>", process.env.NODE_ENVIROMENT);
 
 switch (enviroment) {
   case "develop":
