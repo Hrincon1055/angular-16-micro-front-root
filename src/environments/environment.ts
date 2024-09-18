@@ -9,7 +9,8 @@ export const environment = {
   },
   urlsMicro: {
     modelsAndControls: {
-      remoteEntry: 'http://localhost:4201/remoteEntry.js',
+      remoteEntry:
+        'https://gregarious-bubblegum-562132.netlify.app/remoteEntry.js',
       exposedModule: './ModelsAndControlsModule',
     },
   },
