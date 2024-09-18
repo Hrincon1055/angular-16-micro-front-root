@@ -5,7 +5,6 @@ const {
 let modelsAndControls;
 let publicPathUrl;
 let enviroment = process.env.NODE_ENVIROMENT;
-console.log("webpack.config LINE 12 =>", process.env.NODE_ENVIROMENT);
 
 switch (enviroment) {
   case "develop":
@@ -28,6 +27,7 @@ switch (enviroment) {
     publicPathUrl = "http://localhost:4200/";
     break;
 }
+console.log("webpack.config LINE 31 =>", { modelsAndControls, publicPathUrl });
 const moduleFederationConfig = withModuleFederationPlugin({
   remotes: {
     modelsAndControls: modelsAndControls,
