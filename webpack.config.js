@@ -18,7 +18,8 @@ switch (enviroment) {
     break;
   case "production":
     console.log("webpack.config LINE 20 => production");
-    modelsAndControls = "http://localhost:4201/remoteEntry.js";
+    modelsAndControls =
+      "https://gregarious-bubblegum-562132.netlify.app/remoteEntry.js";
     publicPathUrl = "https://bucolic-dango-87ca31.netlify.app/";
     break;
   default:
@@ -29,7 +30,7 @@ switch (enviroment) {
 }
 const moduleFederationConfig = withModuleFederationPlugin({
   remotes: {
-    modelsAndControls: "http://localhost:4201/remoteEntry.js",
+    modelsAndControls: modelsAndControls,
   },
 
   shared: {
