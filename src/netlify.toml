@@ -1,0 +1,17 @@
+# netlify.toml
+
+[build]
+  # Directorio de salida de la aplicación después del build
+  publish = "dist/root-config"  # Asegúrate de que este sea el directorio correcto donde están tus archivos estáticos
+
+[[redirects]]
+  # Redirigir todas las rutas de la app al index.html (Single Page Application)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  # Redirigir rutas específicas a otros micro frontends si es necesario
+  from = "/modelsAndControls/*"
+  to = "https://gregarious-bubblegum-562132.netlify.app/remoteEntry.js"
+  status = 200
