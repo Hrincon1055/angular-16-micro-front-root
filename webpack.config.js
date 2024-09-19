@@ -18,7 +18,7 @@ switch (enviroment) {
   case "production":
     console.log("webpack.config LINE 20 => production");
     modelsAndControls =
-      "modelsAndControls@https://gregarious-bubblegum-562132.netlify.app/remoteEntry.js";
+      "https://gregarious-bubblegum-562132.netlify.app/remoteEntry.js";
     publicPathUrl = "https://bucolic-dango-87ca31.netlify.app/";
     break;
   default:
