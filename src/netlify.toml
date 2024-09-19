@@ -10,8 +10,4 @@
   to = "/index.html"
   status = 200
 
-[[redirects]]
-  # Redirigir rutas específicas a otros micro frontends si es necesario
-  from = "/modelsAndControls/*"
-  to = "https://gregarious-bubblegum-562132.netlify.app/remoteEntry.js"
-  status = 200
+
