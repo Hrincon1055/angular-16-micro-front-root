@@ -14,12 +14,10 @@ export class MenuComponent implements OnInit {
         {
           label: 'Micro modelos',
           icon: 'pi pi-fw pi-home',
-          routerLink: ['/dashboard'],
+          routerLink: ['/modelsAndControls'],
         },
       ],
     },
-
-
   ];
 
   constructor(public layoutService: LayoutService) {}
