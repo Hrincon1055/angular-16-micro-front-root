@@ -12,44 +12,14 @@ export class MenuComponent implements OnInit {
       label: 'Home',
       items: [
         {
-          label: 'Dashboard',
+          label: 'Micro modelos',
           icon: 'pi pi-fw pi-home',
           routerLink: ['/dashboard'],
         },
       ],
     },
-    {
-      label: 'Otrso Itemn',
-      items: [
-        {
-          label: 'Form Layout',
-          icon: 'pi pi-fw pi-id-card',
-          routerLink: ['/uikit/formlayout'],
-        },
-      ],
-    },
-    {
-      label: 'Aministración',
-      icon: 'pi pi-fw pi-briefcase',
-      items: [
-        {
-          label: 'Configuración',
-          icon: 'pi pi-fw pi-cog',
-          items: [
-            {
-              label: 'Usuarios',
-              icon: 'pi pi-fw pi-users',
-              routerLink: ['/administrar/usuarios'],
-            },
-            {
-              label: 'Crear Usuario',
-              icon: 'pi pi-user',
-              routerLink: ['/administrar/usuario/crear'],
-            },
-          ],
-        },
-      ],
-    },
+
+
   ];
 
   constructor(public layoutService: LayoutService) {}
