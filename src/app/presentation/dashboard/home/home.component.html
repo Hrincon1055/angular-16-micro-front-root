@@ -67,6 +67,820 @@
     </li>
   </ul>
 </div>
+<hr />
+<h1>
+  Demo Microfront Angular 16 con Module Federation - Enfoque Multi-Repo
+  (Proyectos Independientes)
+</h1>
+
+<p>
+  Este proyecto utiliza la versión 16 de Angular y la versión 18.10.0 de NodeJS.
+  El objetivo es crear una arquitectura de microfrontends basada en múltiples
+  repositorios (multi-repo), donde cada microfrontend es un proyecto Angular
+  independiente, desplegado y mantenido por separado.
+</p>
+
+<p>A continuación, describimos los proyectos que vamos a crear:</p>
+
+<h2>rootConfig - Proyecto Contenedor</h2>
+<p>
+  El proyecto <strong>rootConfig</strong> servirá como el contenedor (host) de
+  nuestros microfrontends. Actuará como la base de nuestra aplicación,
+  encargándose de cargar y coordinar los microfrontends remotos.
+</p>
+<pre><code>ng new rootConfig --style=scss --routing=true</code></pre>
+
+<h2>modelsAndControls - Proyecto Microfrontend</h2>
+<p>
+  El proyecto <strong>modelsAndControls</strong> es uno de los microfrontends
+  que vamos a crear. Tendrá sus propios componentes y módulos, y será un
+  proyecto completamente independiente.
+</p>
+<pre><code>ng new modelsAndControls --style=scss --routing=true</code></pre>
+
+<h1>Activación de la Federación de Módulos para Proyectos Angular</h1>
+<p>
+  Para habilitar la federación de módulos en Angular, utilizaremos el paquete
+  <strong>{{ "@angular-architects/module-federation" }}</strong
+  >, el cual ofrece herramientas y utilidades que facilitan la creación de
+  microfrontends. Si deseas obtener más información sobre este enfoque
+  arquitectónico, puedes visitar
+  <a
+    href="https://www.angulararchitects.io/en/aktuelles/the-microfrontend-revolution-module-federation-in-webpack-5/"
+    >este enlace</a
+  >.
+</p>
+
+<p>
+  Para añadir la funcionalidad de federación de módulos a nuestros proyectos,
+  primero instalamos el paquete:
+</p>
+<pre><code>{{"npm i -D @angular-architects/module-federation@16"}}</code></pre>
+
+<p>
+  Una vez instalada la librería, procedemos a agregar la configuración de Module
+  Federation tanto en el proyecto contenedor (<strong>rootConfig</strong>) como
+  en los microfrontends. Esto lo hacemos ejecutando los siguientes comandos:
+</p>
+<pre><code>{{"ng add @angular-architects/module-federation@16 --project rootConfig --port 4200 --type host
+ng add @angular-architects/module-federation@16 --project modelsAndControls --port 4201 --type remote"}}</code></pre>
+
+<p>
+  Estos comandos generarán automáticamente los archivos
+  <strong>webpack.config.js</strong> en cada uno de los proyectos, lo que nos
+  permitirá configurar la federación de módulos.
+</p>
+
+<h2>Configuración de Módulos Federados</h2>
+<p>
+  Después de ejecutar los comandos anteriores, es necesario configurar los
+  módulos federados. En este caso, configuramos el microfrontend
+  <strong>modelsAndControls</strong> para exponer su módulo principal:
+</p>
+
+<h3>Ejemplo de configuración para el microfrontend modelsAndControls:</h3>
+<pre><code>{{"const { shareAll, withModuleFederationPlugin } = require('@angular-architects/module-federation/webpack');
+
+const moduleFederationConfig = withModuleFederationPlugin({
+  name: 'modelsAndControls',
+
+  exposes: {
+    './ModelsAndControlsModule': './src/app/presentation/modelsAndControls/modelsAndControls.module.ts',
+  },
+
+  shared: {
+    ...shareAll({
+      singleton: true,
+      strictVersion: true,
+      requiredVersion: 'auto',
+    }),
+  },
+});
+moduleFederationConfig.output.publicPath = 'http://localhost:4201/';
+module.exports = moduleFederationConfig;"}}</code></pre>
+
+<p>
+  Esta configuración indica que el microfrontend
+  <strong>modelsAndControls</strong> expondrá su módulo principal,
+  <code>ModelsAndControlsModule</code>, para que pueda ser utilizado por otros
+  microfrontends o el contenedor.
+</p>
+
+<h1>Comunicación entre Microfrontends Usando PubSubJS</h1>
+<p>
+  Para habilitar la comunicación entre microfrontends independientes, podemos
+  utilizar la librería <strong>PubSubJS</strong>. Esta librería permite
+  implementar un sistema de publicación y suscripción para el intercambio de
+  datos entre componentes o módulos sin necesidad de acoplarlos directamente.
+</p>
+<p>
+  Para instalar PubSubJS, ejecuta el siguiente comando en los microfrontends que
+  necesiten esta funcionalidad:
+</p>
+<pre><code>npm i pubsub-js</code></pre>
+
+<p>
+  Adicionalmente, es necesario instalar los tipos de TypeScript para evitar
+  posibles problemas:
+</p>
+<pre><code>{{"npm i -D @types/pubsub-js"}}</code></pre>
+
+<p>
+  Finalmente, aseguramos que en el archivo <code>tsconfig.json</code> se permite
+  la importación de módulos sintéticos, agregando la siguiente opción:
+</p>
+<pre><code>"compilerOptions": {{'{
+  ...,
+  "allowSyntheticDefaultImports": true
+}'}}</code></pre>
+
+<h1>Uso de PrimeNG y PrimeFlex en Angular 16</h1>
+<p>
+  Este proyecto también utiliza las librerías <strong>PrimeNG</strong> y
+  <strong>PrimeFlex</strong> para los componentes de interfaz de usuario. Estas
+  librerías proporcionan un conjunto de componentes y utilidades de diseño
+  flexibles y altamente configurables.
+</p>
+
+<h2>Instalación de PrimeNG en rootConfig</h2>
+<p>
+  Para instalar PrimeNG en el proyecto <strong>rootConfig</strong>, ejecutamos
+  el siguiente comando:
+</p>
+<pre><code>npm install primeng</code></pre>
+
+<h2>Instalación de PrimeFlex en rootConfig</h2>
+<p>
+  Para añadir el sistema de diseño flex de PrimeNG (PrimeFlex), instalamos el
+  siguiente paquete:
+</p>
+<pre><code>npm install primeflex</code></pre>
+
+<h2>Instalación de PrimeIcons en rootConfig</h2>
+<p>
+  PrimeIcons es la librería de iconos utilizada por PrimeNG. Para instalarla,
+  ejecutamos:
+</p>
+<pre><code>npm install primeicons</code></pre>
+
+<h2>Configuración de Estilos</h2>
+<p>
+  Para hacer uso de los estilos de PrimeNG, PrimeFlex y PrimeIcons en el
+  proyecto, es necesario agregar las rutas de los archivos CSS correspondientes
+  en el archivo <code>angular.json</code> o directamente en
+  <code>src/styles.css</code>:
+</p>
+<pre><code>{{" 'styles': [
+    'src/styles.scss',
+    'node_modules/primeng/resources/primeng.min.css',
+    'node_modules/primeicons/primeicons.css'
+  ]"}}</code></pre>
+
+<h2>Temas</h2>
+<p>
+  PrimeNG ofrece una variedad de temas predefinidos. En este proyecto utilizamos
+  el tema <strong>arya-purple</strong>, el cual se encuentra en la carpeta
+  <code>assets/layout/styles/theme/arya-purple/theme.css</code>. Si estás usando
+  la plantilla <strong>Sakai</strong>, puedes descargarla de
+  <a href="https://github.com/primefaces/sakai-ng">GitHub</a> y personalizar el
+  tema para que coincida con la línea gráfica de tu aplicación.
+</p>
+
+<h2>Importación de Estilos en SCSS</h2>
+<p>
+  Es importante importar los estilos de PrimeNG, PrimeFlex y PrimeIcons en tu
+  archivo <code>.scss</code>. Aquí te mostramos cómo hacerlo:
+</p>
+<pre><code>{{"@import 'assets/layout/styles/layout/layout.scss';
+@import '../node_modules/primeng/resources/primeng.min.css';
+@import '../node_modules/primeflex/primeflex.scss';
+@import '../node_modules/primeicons/primeicons.css';}}</code></pre>
+
+<h2>Modificaciones en el Archivo index.html</h2>
+<p>
+  Por último, es necesario agregar el enlace al tema en el archivo
+  <code>index.html</code> para que los estilos del tema se apliquen
+  correctamente:
+</p>
+<pre><code>{{"link id='theme-css' rel='stylesheet' type='text/css' href='assets/layout/styles/theme/arya-purple/theme.css'"}}</code></pre>
+<hr />
+<h1>
+  Configuración detallada del archivo webpack.config.js con soporte para
+  múltiples entornos
+</h1>
+
+<p>
+  El archivo <code>webpack.config.js</code> en esta configuración hace uso de
+  <strong>Module Federation</strong> para cargar micro frontends de forma
+  dinámica, y está configurado para manejar distintos entornos:
+  <strong>desarrollo</strong>, <strong>QA</strong> y
+  <strong>producción</strong>. A continuación, te explico los elementos clave:
+</p>
+
+<h2>Importación de módulos</h2>
+<p>
+  Primero, se importa el plugin <code>withModuleFederationPlugin</code> y el
+  método <code>shareAll</code> de la librería
+  <code>{{ "@angular-architects/module-federation/webpack" }}</code
+  >, que facilita la integración de Module Federation en un proyecto Angular.
+</p>
+
+<pre><code>
+{{"const {
+  shareAll,
+  withModuleFederationPlugin,
+} = require('@angular-architects/module-federation/webpack');"}}
+  </code></pre>
+
+<h2>Configuración de entornos</h2>
+<p>
+  La configuración utiliza una variable de entorno llamada
+  <code>NODE_ENVIRONMENT</code> que define en qué ambiente está operando el
+  proyecto. Dependiendo del valor de esta variable, se asignan diferentes URLs
+  para los micro frontends remotos y el <code>publicPath</code> que Angular
+  usará para cargar los recursos.
+</p>
+
+<p>
+  El código emplea un <code>switch</code> para manejar tres entornos diferentes:
+</p>
+<ul>
+  <li><strong>develop</strong>: Para desarrollo local.</li>
+  <li><strong>qa</strong>: Para pruebas de calidad en un servidor remoto.</li>
+  <li>
+    <strong>production</strong>: Para producción, donde los micro frontends se
+    alojan en Netlify.
+  </li>
+</ul>
+
+<pre><code>
+{{'let modelsAndControls;
+let publicPathUrl;
+let enviroment = process.env.NODE_ENVIROMENT;
+
+switch (enviroment) {
+  case "develop":
+    modelsAndControls = "http://localhost:4201/remoteEntry.js";
+    publicPathUrl = "http://localhost:4200/";
+    break;
+  case "qa":
+    modelsAndControls = "https://qa.example.com/remoteEntry.js";
+    publicPathUrl = "http://localhost:4200/";
+    break;
+  case "production":
+    modelsAndControls =
+      "modelsAndControls@https://gregarious-bubblegum-562132.netlify.app/remoteEntry.js";
+    publicPathUrl = "https://bucolic-dango-87ca31.netlify.app/";
+    break;
+  default:
+    modelsAndControls = "http://localhost:4201/remoteEntry.js";
+    publicPathUrl = "http://localhost:4200/";
+    break;
+}'}}
+  </code></pre>
+
+<h2>Variables de entorno</h2>
+<p>
+  Las variables de entorno (<code>NODE_ENVIRONMENT</code>) permiten seleccionar
+  el comportamiento correcto de la aplicación según el entorno en el que se está
+  ejecutando. Esto es fundamental en aplicaciones grandes que tienen diferentes
+  requisitos según el entorno (por ejemplo, diferentes URLs para APIs, micro
+  frontends, etc.).
+</p>
+
+<p>
+  En este caso, la variable <code>modelsAndControls</code> se usa para almacenar
+  la URL de un micro frontend remoto que se carga de forma dinámica, y
+  <code>publicPathUrl</code> se usa para especificar el path público desde donde
+  se servirán los recursos del host.
+</p>
+
+<h2>Configuración de Module Federation</h2>
+<p>
+  A continuación, se utiliza el método
+  <code>withModuleFederationPlugin</code> para configurar la federación de
+  módulos. En esta configuración, se está exponiendo un micro frontend llamado
+  <code>modelsAndControls</code>, cuya URL dependerá del entorno (definido en el
+  paso anterior).
+</p>
+
+<p>
+  Además, se utiliza el método <code>shareAll</code> para compartir dependencias
+  de forma eficiente entre el host y los micro frontends remotos. Esto es útil
+  para evitar la duplicación de bibliotecas entre múltiples micro frontends.
+</p>
+
+<pre><code>
+{{'const moduleFederationConfig = withModuleFederationPlugin({
+  remotes: {
+    modelsAndControls: modelsAndControls,
+  },
+
+  shared: {
+    ...shareAll({
+      singleton: true,
+      strictVersion: true,
+      requiredVersion: "auto",
+    }),
+  },
+});'}}
+  </code></pre>
+
+<h2>Configuración de <code>publicPath</code></h2>
+<p>
+  Finalmente, se establece el <code>publicPath</code> con el valor de
+  <code>publicPathUrl</code> que se configuró previamente según el entorno. Esto
+  le indica a Angular y Webpack dónde encontrar los archivos compilados.
+</p>
+
+<pre><code>
+moduleFederationConfig.output.publicPath = publicPathUrl;
+module.exports = moduleFederationConfig;
+  </code></pre>
+
+<h2>Resumen</h2>
+<p>
+  En resumen, este archivo de configuración de Webpack permite a la aplicación
+  de Angular cargar micro frontends remotos desde diferentes entornos
+  (desarrollo, QA, producción), y establece un path público adecuado para cargar
+  los recursos correctamente en cada entorno. Además, permite compartir
+  dependencias entre el host y los micro frontends remotos para mejorar la
+  eficiencia y evitar redundancias.
+</p>
+<hr />
+<h1>
+  Explicación del archivo <code>netlify.toml</code> para el despliegue en
+  Netlify del micro rootConfig que contendra los micros remotos
+</h1>
+
+<p>
+  El archivo <code>netlify.toml</code> es utilizado por Netlify para configurar
+  el comportamiento del despliegue de tu aplicación. Este archivo contiene
+  instrucciones específicas para el proceso de compilación, la configuración de
+  rutas y redirecciones.
+</p>
+
+<h2>Sección de <code>[build]</code></h2>
+<p>
+  La sección <code>[build]</code> especifica las configuraciones necesarias para
+  el proceso de construcción (<em>build</em>) de la aplicación.
+</p>
+
+<pre><code>
+[build]
+  # Directorio de salida de la aplicación después del build
+  publish = "dist/root-config"
+  </code></pre>
+
+<p>
+  <strong>publish:</strong> Este campo indica el directorio donde se almacenan
+  los archivos estáticos generados por la aplicación Angular después de ejecutar
+  el comando de <code>build</code>. En este caso, se trata de
+  <code>dist/root-config</code>, que es el directorio donde Angular deposita los
+  archivos listos para producción. Asegúrate de que este valor coincida con el
+  nombre correcto de la carpeta en tu proyecto.
+</p>
+
+<h2>Redirecciones</h2>
+<p>
+  En aplicaciones de una sola página (<em>Single Page Applications</em> o SPA),
+  todas las rutas que no coinciden directamente con un archivo en el servidor
+  deben redirigirse al archivo <code>index.html</code> para que el enrutador del
+  frontend (en este caso, Angular) pueda gestionar la navegación. Esta
+  redirección es fundamental para que la aplicación funcione correctamente
+  cuando se actualiza la página o se accede a rutas internas directamente.
+</p>
+
+<pre><code>
+[[redirects]]
+  # Redirigir todas las rutas de la app al index.html (Single Page Application)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  </code></pre>
+
+<ul>
+  <li>
+    <strong>from:</strong> Este campo indica que cualquier ruta
+    (<code>/*</code>) de la aplicación será interceptada.
+  </li>
+  <li>
+    <strong>to:</strong> Todas las rutas serán redirigidas al archivo
+    <code>/index.html</code>, donde Angular podrá manejar la navegación interna
+    de la SPA.
+  </li>
+  <li>
+    <strong>status:</strong> El estado <code>200</code> indica una redirección
+    "invisible", es decir, aunque la URL cambie, el navegador no percibe que ha
+    sido redirigido. Esto es importante para que las rutas internas funcionen
+    sin problemas.
+  </li>
+</ul>
+
+<h2>Resumen</h2>
+<p>
+  Este archivo <code>netlify.toml</code> es esencial para desplegar aplicaciones
+  Angular en Netlify. Se asegura de que los archivos estáticos generados tras el
+  <code>build</code> se publiquen correctamente y que todas las rutas sean
+  gestionadas por Angular, garantizando así que la aplicación funcione
+  correctamente como una SPA.
+</p>
+<hr />
+<h1>
+  Explicación del archivo <code>netlify.toml</code> para el microfrontend
+  <em>models-and-controls</em>
+</h1>
+
+<p>
+  El archivo <code>netlify.toml</code> en este contexto está configurado para
+  gestionar el despliegue del microfrontend llamado
+  <strong>models-and-controls</strong> en Netlify. Este archivo contiene
+  configuraciones que dictan cómo Netlify debe manejar la construcción, los
+  encabezados CORS y las redirecciones dentro de la aplicación.
+</p>
+
+<h2>Sección de <code>[build]</code></h2>
+<p>
+  Esta sección define la configuración necesaria para el proceso de construcción
+  (<em>build</em>) de la aplicación.
+</p>
+
+<pre><code>
+[build]
+  # Directorio de salida de la aplicación después del build
+  publish = "dist/models-and-controls"
+  </code></pre>
+
+<p>
+  <strong>publish:</strong> Este campo indica la ubicación donde Netlify debe
+  buscar los archivos que serán desplegados después de ejecutar el comando de
+  <code>build</code>. En este caso, el directorio es
+  <code>dist/models-and-controls</code>, lo cual es donde se almacenan los
+  archivos estáticos listos para producción. Es importante asegurarse de que
+  este valor coincida con el nombre correcto de la carpeta generada por Angular.
+</p>
+
+<h2>Configuración de Encabezados CORS</h2>
+<p>
+  El archivo define reglas para aplicar encabezados CORS (<em
+    >Cross-Origin Resource Sharing</em
+  >) al archivo <code>remoteEntry.js</code> y a otros archivos JavaScript
+  generados. Estos encabezados permiten que estos archivos puedan ser
+  solicitados desde dominios diferentes al origen del servidor.
+</p>
+
+<pre><code>
+[[headers]]
+  # Aplicar encabezados CORS al archivo remoteEntry.js y otros archivos JavaScript
+   for = "/*.js"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, OPTIONS"
+    Access-Control-Allow-Headers = "Origin, Content-Type, Accept"
+  </code></pre>
+
+<ul>
+  <li>
+    <strong>for:</strong> Aplica los encabezados CORS a todos los archivos con
+    la extensión <code>.js</code>, incluido el <code>remoteEntry.js</code>, que
+    es crucial en microfrontends con Module Federation para poder ser consumido
+    por diferentes servidores.
+  </li>
+  <li>
+    <strong>Access-Control-Allow-Origin:</strong> Permite que cualquier origen
+    (<code>*</code>) pueda solicitar estos archivos JavaScript.
+  </li>
+  <li>
+    <strong>Access-Control-Allow-Methods:</strong> Especifica los métodos HTTP
+    permitidos, en este caso <code>GET</code> y <code>OPTIONS</code>.
+  </li>
+  <li>
+    <strong>Access-Control-Allow-Headers:</strong> Indica que los encabezados
+    <code>Origin</code>, <code>Content-Type</code> y <code>Accept</code> son
+    permitidos en las solicitudes.
+  </li>
+</ul>
+
+<h2>Redirecciones</h2>
+<p>
+  Las redirecciones son fundamentales en aplicaciones de una sola página (<em
+    >Single Page Applications</em
+  >
+  o SPA) para garantizar que todas las rutas sean gestionadas por el enrutador
+  del frontend (Angular, en este caso). Este archivo
+  <code>netlify.toml</code> también define redirecciones específicas para
+  manejar correctamente los activos (como imágenes o fuentes).
+</p>
+
+<pre><code>
+[[redirects]]
+  # Redirigir todas las rutas de la app al index.html (Single Page Application)
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/assets/*"
+  to = "/assets/:splat"
+  status = 200
+  force = false
+  </code></pre>
+
+<ul>
+  <li>
+    <strong>from:</strong> Para todas las rutas de la aplicación
+    (<code>/*</code>), redirige a <code>/index.html</code>, permitiendo que
+    Angular maneje la navegación interna de la SPA.
+  </li>
+  <li>
+    <strong>status:</strong> El código de estado <code>200</code> indica una
+    redirección invisible, donde la URL cambia, pero el navegador no detecta la
+    redirección.
+  </li>
+  <li>
+    <strong>from:</strong> También se define una redirección específica para los
+    recursos estáticos dentro de <code>/assets/*</code>, permitiendo que estos
+    se sirvan directamente.
+  </li>
+  <li>
+    <strong>to:</strong> Usa la variable <code>:splat</code> para mantener el
+    nombre del archivo o recurso solicitado.
+  </li>
+  <li>
+    <strong>force:</strong> Este valor indica si la redirección debe forzarse o
+    no. En este caso, <code>false</code> indica que la redirección solo se
+    aplicará si no se encuentra el recurso de forma nativa en el servidor.
+  </li>
+</ul>
+
+<h2>Resumen</h2>
+<p>
+  Este archivo <code>netlify.toml</code> está diseñado para desplegar el
+  microfrontend <strong>models-and-controls</strong> en Netlify. Configura el
+  proceso de construcción, gestiona las redirecciones para una SPA y asegura que
+  los archivos JavaScript puedan ser accedidos desde cualquier dominio gracias a
+  los encabezados CORS.
+</p>
+<hr />
+<h1>Estructura de Carpetas del Proyecto</h1>
+
+<p>
+  Este proyecto sigue una estructura modular organizada para facilitar el
+  mantenimiento y escalabilidad. A continuación se detalla la estructura de
+  carpetas y archivos del proyecto Angular y su propósito.
+</p>
+
+<pre><code>
+  └── rootConfig/
+      ├── src/
+      │   ├── app/
+      │   │   ├── domain/
+      │   │   │   ├── interfaces/
+      │   │   │   ├── mock/
+      │   │   │   ├── stubs/
+      │   │   │   └── usecases/
+      │   │   ├── infrastructure/
+      │   │   │   └── ui/
+      │   │   │       ├── app-layout.service.ts
+      │   │   │       ├── app.loader.service.ts
+      │   │   │       └── app.menu.service.ts
+      │   │   ├── layouts/
+      │   │   │   ├── admin-layout/
+      │   │   │   │   ├── admin-layout.component.html
+      │   │   │   │   ├── admin-layout.component.scss
+      │   │   │   │   ├── admin-layout.component.spec.ts
+      │   │   │   │   └── admin-layout.component.ts
+      │   │   │   └── layouts.module.ts
+      │   │   ├── interceptors/
+      │   │   ├── presentation/
+      │   │   │   ├── components/
+      │   │   │   ├── dashboard/
+      │   │   │   │   ├── home/
+      │   │   │   │   ├── dashboard-routing.module.ts
+      │   │   │   └── └── dashboard.module.ts
+      │   │   ├── primeng/
+      │   │   │   └── primeng.module.ts
+      │   │   ├── shared/
+      │   │   │   ├── constants/
+      │   │   │   ├── guards/
+      │   │   │   ├── directives/
+      │   │   │   ├── pipes/
+      │   │   │   └── shared.module.ts
+      │   │   ├── app-routing.module.ts
+      │   │   ├── app.component.html
+      │   │   ├── app.component.scss
+      │   │   ├── app.component.spec.ts
+      │   │   ├── app.component.ts
+      │   │   └── app.module.ts
+      │   ├── assets/
+      │   │   ├── i18n/
+      │   │   ├── layout/
+      │   │   │  ├── images/
+      │   │   └──└── styles/
+      │   ├── environments/
+      │   ├── utils/
+      │   ├── bootstrap.ts
+      │   ├── favicon.ico
+      │   ├── index.html
+      │   ├── karma.conf.js
+      │   ├── main.ts
+      │   └── styles.scss
+      ├── .editorconfig
+      ├── .gitignore
+      ├── angular.json
+      ├── package-lock.json
+      ├── package.json
+      ├── README.md
+      ├── tsconfig.app.json
+      ├── tsconfig.json
+      ├── tsconfig.spec.json
+      ├── webpack.config.js
+      ├── webpack.prod.config.js
+      └── ...
+  </code></pre>
+
+<h2>Descripción de cada carpeta y archivo</h2>
+
+<h3><code>rootConfig/</code></h3>
+<p>
+  Directorio raíz del proyecto, donde se encuentra el código fuente y los
+  archivos de configuración principales.
+</p>
+
+<h3><code>src/</code></h3>
+<p>Contiene todo el código fuente de la aplicación.</p>
+
+<h4><code>app/</code></h4>
+<p>
+  Directorio principal de la aplicación Angular, organizado en varios módulos y
+  capas.
+</p>
+
+<h5><code>domain/</code></h5>
+<p>Contiene la lógica del dominio de la aplicación:</p>
+<ul>
+  <li>
+    <strong>interfaces/</strong>: Define contratos y estructuras de datos
+    utilizadas en la aplicación.
+  </li>
+  <li><strong>mock/</strong>: Datos falsos para pruebas y desarrollo.</li>
+  <li><strong>stubs/</strong>: Clases simuladas para pruebas unitarias.</li>
+  <li><strong>usecases/</strong>: Casos de uso o lógica de negocio clave.</li>
+</ul>
+
+<h5><code>infrastructure/</code></h5>
+<p>
+  Contiene la lógica relacionada con la infraestructura, como servicios de
+  interfaz de usuario (UI).
+</p>
+
+<h6><code>ui/</code></h6>
+<ul>
+  <li>
+    <strong>app-layout.service.ts</strong>: Servicio para gestionar el layout de
+    la aplicación.
+  </li>
+  <li>
+    <strong>app.loader.service.ts</strong>: Servicio para gestionar el loader o
+    indicador de carga.
+  </li>
+  <li>
+    <strong>app.menu.service.ts</strong>: Servicio para gestionar el menú de la
+    aplicación.
+  </li>
+</ul>
+
+<h5><code>layouts/</code></h5>
+<p>Gestión de las distintas disposiciones visuales de la aplicación.</p>
+
+<ul>
+  <li>
+    <strong>admin-layout/</strong>: Contiene la estructura del layout del
+    administrador.
+  </li>
+  <li>
+    <strong>admin-layout.component.ts</strong>: Componente que define la lógica
+    del layout.
+  </li>
+  <li>
+    <strong>admin-layout.component.html</strong>: Template HTML del layout del
+    administrador.
+  </li>
+  <li>
+    <strong>admin-layout.component.scss</strong>: Estilos específicos del layout
+    del administrador.
+  </li>
+</ul>
+
+<h5><code>interceptors/</code></h5>
+<p>
+  Contiene interceptores HTTP para manejar la modificación de solicitudes y
+  respuestas globales.
+</p>
+
+<h5><code>presentation/</code></h5>
+<p>Contiene los componentes visuales y las vistas de la aplicación.</p>
+
+<ul>
+  <li>
+    <strong>dashboard/</strong>: Módulo y vistas relacionadas con el panel de
+    control de la aplicación.
+  </li>
+  <li>
+    <strong>dashboard-routing.module.ts</strong>: Configuración de rutas del
+    dashboard.
+  </li>
+  <li><strong>dashboard.module.ts</strong>: Módulo del dashboard.</li>
+</ul>
+
+<h5><code>primeng/</code></h5>
+<p>
+  Contiene la integración de PrimeNG, una biblioteca de componentes UI para
+  Angular.
+</p>
+
+<ul>
+  <li>
+    <strong>primeng.module.ts</strong>: Módulo que importa los componentes de
+    PrimeNG utilizados en la aplicación.
+  </li>
+</ul>
+
+<h5><code>shared/</code></h5>
+<p>
+  Contiene recursos compartidos como constantes, directivas, pipes, y guardias
+  de ruta.
+</p>
+
+<ul>
+  <li>
+    <strong>constants/</strong>: Constantes globales utilizadas en la
+    aplicación.
+  </li>
+  <li>
+    <strong>guards/</strong>: Guardias de ruta que protegen las rutas
+    específicas.
+  </li>
+  <li><strong>directives/</strong>: Directivas personalizadas de Angular.</li>
+  <li><strong>pipes/</strong>: Pipes para la transformación de datos.</li>
+</ul>
+
+<h5><code>app.component.*</code></h5>
+<p>
+  Componente raíz de la aplicación, que define el punto de entrada de la UI.
+</p>
+
+<h5><code>assets/</code></h5>
+<p>
+  Carpeta que contiene recursos estáticos como imágenes, estilos y archivos de
+  internacionalización (i18n).
+</p>
+
+<h5><code>environments/</code></h5>
+<p>
+  Configuración de variables de entorno para diferentes entornos (desarrollo,
+  producción, etc.).
+</p>
+
+<h5><code>utils/</code></h5>
+<p>Funciones y utilidades reutilizables a lo largo de la aplicación.</p>
+
+<h5><code>bootstrap.ts</code></h5>
+<p>Punto de arranque de la aplicación Angular.</p>
+
+<h5><code>index.html</code></h5>
+<p>
+  Archivo HTML principal de la aplicación. Aquí se monta el componente raíz.
+</p>
+
+<h5><code>styles.scss</code></h5>
+<p>Archivo de estilos globales de la aplicación.</p>
+
+<h5>Archivos de Configuración</h5>
+<ul>
+  <li>
+    <strong>.editorconfig</strong>: Configuración de estilo de código para el
+    editor.
+  </li>
+  <li>
+    <strong>.gitignore</strong>: Lista de archivos y carpetas que Git debe
+    ignorar.
+  </li>
+  <li>
+    <strong>angular.json</strong>: Archivo de configuración del proyecto
+    Angular.
+  </li>
+  <li>
+    <strong>package.json</strong>: Dependencias del proyecto y scripts de npm.
+  </li>
+  <li>
+    <strong>tsconfig.json</strong>: Configuración del compilador TypeScript.
+  </li>
+  <li>
+    <strong>webpack.config.js</strong>: Configuración de Webpack para el
+    proyecto.
+  </li>
+</ul>
 <footer>
   <p>&copy; 2024 - Proyecto desarrollado por Henry Rincon Santana</p>
 </footer>
